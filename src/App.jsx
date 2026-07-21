@@ -2,43 +2,53 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Users, ShoppingCart, BarChart3, PlusCircle, Search, Check,
   AlertTriangle, X, Loader2, Trash2, ChevronDown, ChevronUp, Store, RefreshCw, Calendar,
-  Menu, Download
+  Menu, Download, Image, Upload, ChevronLeft
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts';
 import * as XLSX from 'xlsx';
+import { upload } from '@vercel/blob/client';
 
 /* ------------------------------------------------------------------ */
 /* Design tokens                                                       */
 /* ------------------------------------------------------------------ */
 const theme = {
-  bg: '#F6F3EC',
-  surface: '#FFFFFF',
-  ink: '#22271F',
-  inkSoft: '#6E6A5E',
-  border: '#E4DFD2',
-  primary: '#1E3A34',
-  primarySoft: '#2E4F47',
-  accent: '#B8863B',
-  accentSoft: '#F1E4C8',
-  success: '#3F7A5D',
-  successSoft: '#E4EFE8',
-  danger: '#B0483A',
-  dangerSoft: '#F5E4E1',
+  bg: '#EAE6DF',
+  surface: '#FDFCFA',
+  ink: '#1A1A17',
+  inkSoft: '#6B6862',
+  border: '#DDD8CE',
+  primary: '#1A1A17',
+  primarySoft: '#33322E',
+  accent: '#A9905B',
+  accentSoft: '#EDE6D6',
+  success: '#6B8F71',
+  successSoft: '#E7EEE7',
+  danger: '#B5654F',
+  dangerSoft: '#F3E6E1',
 };
 
 const FONTS = `
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
-.venusex-root { font-family: 'Inter', system-ui, sans-serif; }
-.venusex-display { font-family: 'Fraunces', Georgia, serif; }
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap');
+.venusex-root { font-family: 'Jost', system-ui, sans-serif; }
+.venusex-display { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; text-transform: lowercase; }
 .venusex-nums { font-variant-numeric: tabular-nums; }
-.venusex-eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
+.venusex-eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: lowercase; font-weight: 500; }
+.venusex-label { text-transform: lowercase; letter-spacing: 0.03em; }
 input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.6; }
 `;
 
 const STORAGE_KEYS = { clientes: 'venusex_clientes_v1', vendas: 'venusex_vendas_v1' };
+const CATALOGO_KEYS = { clientes: 'venusex_catalogo_clientes_v1', midias: 'venusex_catalogo_midias_v1' };
 const PAGAMENTOS = ['Dinheiro', 'Débito', 'Crédito', 'Pix', 'Boleto', 'Transferência'];
+const CATALOGO_CATEGORIAS = [
+  'Comunicação Visual',
+  'Identidade',
+  'Posts para Rede',
+  'Captação e Edição de fotos e vídeos',
+];
+const MAX_MIDIA_BYTES = 50 * 1024 * 1024;
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                              */
@@ -169,7 +179,7 @@ async function fetchList(key) {
 function Field({ label, children, hint }) {
   return (
     <label className="block mb-4">
-      <span className="block text-sm font-medium mb-1.5" style={{ color: theme.ink }}>{label}</span>
+      <span className="venusex-label block text-sm font-medium mb-1.5" style={{ color: theme.ink }}>{label}</span>
       {children}
       {hint && <span className="block text-xs mt-1" style={{ color: theme.inkSoft }}>{hint}</span>}
     </label>
@@ -221,7 +231,7 @@ function ConfirmDeleteButton({ onConfirm, label }) {
       <div className="flex items-center gap-1">
         <button
           onClick={(e) => { e.stopPropagation(); setArmed(false); onConfirm(); }}
-          className="px-2 py-1 rounded-lg text-xs font-medium"
+          className="venusex-label px-2 py-1 rounded-lg text-xs font-medium"
           style={{ backgroundColor: theme.dangerSoft, color: theme.danger }}
         >
           Confirmar
@@ -362,7 +372,7 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
             className="mt-2.5 flex items-start gap-2 rounded-xl px-3.5 py-2.5 text-sm"
             style={{
               backgroundColor: matched ? theme.successSoft : theme.accentSoft,
-              color: matched ? theme.success : '#8A661F',
+              color: matched ? theme.success : '#8C7328',
             }}
           >
             {matched ? <Check size={16} className="mt-0.5 shrink-0" /> : <AlertTriangle size={16} className="mt-0.5 shrink-0" />}
@@ -423,7 +433,7 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
             <button
               key={p}
               onClick={() => setModalidade(p)}
-              className="px-3 py-1.5 rounded-full text-sm font-medium border transition-colors"
+              className="venusex-label px-3 py-1.5 rounded-full text-sm font-medium border transition-colors"
               style={modalidade === p
                 ? { backgroundColor: theme.primary, color: '#FFF', borderColor: theme.primary }
                 : { backgroundColor: '#FFF', color: theme.ink, borderColor: theme.border }}
@@ -440,7 +450,7 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
             <button
               key={opt.l}
               onClick={() => setParcelado(opt.v)}
-              className="flex-1 py-2 rounded-xl text-sm font-medium border transition-colors"
+              className="venusex-label flex-1 py-2 rounded-xl text-sm font-medium border transition-colors"
               style={parcelado === opt.v
                 ? { backgroundColor: theme.primary, color: '#FFF', borderColor: theme.primary }
                 : { backgroundColor: '#FFF', color: theme.ink, borderColor: theme.border }}
@@ -472,7 +482,7 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
       <button
         onClick={handleSubmit}
         disabled={!canSubmit || saving}
-        className="w-full mt-2 py-3.5 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-opacity"
+        className="venusex-label w-full mt-2 py-3.5 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-opacity"
         style={{ backgroundColor: canSubmit ? theme.accent : theme.border, color: canSubmit ? '#FFFFFF' : theme.inkSoft, opacity: saving ? 0.7 : 1 }}
       >
         {saving ? <Loader2 size={18} className="animate-spin" /> : <PlusCircle size={18} />}
@@ -623,7 +633,7 @@ function AgendamentosTab({ vendas, onTogglePagamento }) {
 
   const statusStyle = {
     vencida: { backgroundColor: theme.dangerSoft, color: theme.danger, label: 'Vencida' },
-    proxima: { backgroundColor: theme.accentSoft, color: '#8A661F', label: 'Próxima' },
+    proxima: { backgroundColor: theme.accentSoft, color: '#8C7328', label: 'Próxima' },
     futura: { backgroundColor: theme.bg, color: theme.inkSoft, label: 'Agendada' },
     paga: { backgroundColor: theme.successSoft, color: theme.success, label: 'Paga' },
   };
@@ -652,7 +662,7 @@ function AgendamentosTab({ vendas, onTogglePagamento }) {
           <button
             key={opt.l}
             onClick={() => setShowAll(opt.v)}
-            className="flex-1 py-2 rounded-xl text-sm font-medium border transition-colors"
+            className="venusex-label flex-1 py-2 rounded-xl text-sm font-medium border transition-colors"
             style={showAll === opt.v
               ? { backgroundColor: theme.primary, color: '#FFF', borderColor: theme.primary }
               : { backgroundColor: '#FFF', color: theme.ink, borderColor: theme.border }}
@@ -774,7 +784,7 @@ function ResumoTab({ vendas }) {
       <button
         onClick={() => exportarVendasExcel(filtered, dataInicial, dataFinal)}
         disabled={filtered.length === 0}
-        className="w-full mb-4 py-3 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-opacity"
+        className="venusex-label w-full mb-4 py-3 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-opacity"
         style={{
           backgroundColor: filtered.length > 0 ? theme.primary : theme.border,
           color: filtered.length > 0 ? '#FFFFFF' : theme.inkSoft,
@@ -786,6 +796,148 @@ function ResumoTab({ vendas }) {
 
       <div className="text-sm text-center" style={{ color: theme.inkSoft }}>
         {filtered.length} venda{filtered.length === 1 ? '' : 's'} no período
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Catálogo tab                                                         */
+/* ------------------------------------------------------------------ */
+function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteCliente, onUpload, onDeleteMidia, uploading }) {
+  const [selectedClienteId, setSelectedClienteId] = useState(null);
+  const [selectedCategoria, setSelectedCategoria] = useState(null);
+  const [novoNome, setNovoNome] = useState('');
+
+  const selectedCliente = catalogoClientes.find((c) => c.id === selectedClienteId) || null;
+
+  function handleAdd() {
+    if (!novoNome.trim()) return;
+    onAddCliente(novoNome.trim());
+    setNovoNome('');
+  }
+
+  function handleFileChange(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.size > MAX_MIDIA_BYTES) {
+      window.alert('Arquivo maior que 50MB. Escolha um arquivo menor.');
+      return;
+    }
+    onUpload(file, selectedClienteId, selectedCategoria);
+  }
+
+  if (selectedClienteId && selectedCategoria) {
+    const midias = catalogoMidias
+      .filter((m) => m.clienteId === selectedClienteId && m.categoria === selectedCategoria)
+      .sort((a, b) => (a.dataUpload < b.dataUpload ? 1 : -1));
+
+    return (
+      <div className="pb-4">
+        <button onClick={() => setSelectedCategoria(null)} className="flex items-center gap-1 text-sm mb-4" style={{ color: theme.inkSoft }}>
+          <ChevronLeft size={16} /> voltar
+        </button>
+        <div className="venusex-eyebrow mb-1" style={{ color: theme.accent }}>{selectedCliente?.nome}</div>
+        <div className="venusex-display text-xl mb-4" style={{ color: theme.ink }}>{selectedCategoria}</div>
+
+        <label
+          className={`venusex-label flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-semibold text-[15px] mb-5 cursor-pointer transition-opacity ${uploading ? 'opacity-70 pointer-events-none' : ''}`}
+          style={{ backgroundColor: theme.accent, color: '#FFFFFF' }}
+        >
+          {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
+          {uploading ? 'enviando…' : 'enviar arquivo'}
+          <input type="file" accept="image/*,video/*" className="hidden" onChange={handleFileChange} disabled={uploading} />
+        </label>
+
+        {midias.length === 0 && (
+          <div className="text-center py-10 text-sm" style={{ color: theme.inkSoft }}>Nenhum arquivo nessa categoria ainda.</div>
+        )}
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {midias.map((m) => (
+            <div key={m.id} className="relative rounded-xl overflow-hidden border" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+              {m.tipo === 'video' ? (
+                <video src={m.url} className="w-full h-32 object-cover" controls preload="metadata" />
+              ) : (
+                <img src={m.url} alt={m.nomeArquivo} className="w-full h-32 object-cover" />
+              )}
+              <div className="absolute top-1.5 right-1.5">
+                <ConfirmDeleteButton onConfirm={() => onDeleteMidia(m)} label="Excluir arquivo" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedClienteId) {
+    return (
+      <div className="pb-4">
+        <button onClick={() => setSelectedClienteId(null)} className="flex items-center gap-1 text-sm mb-4" style={{ color: theme.inkSoft }}>
+          <ChevronLeft size={16} /> voltar
+        </button>
+        <div className="venusex-display text-xl mb-5" style={{ color: theme.ink }}>{selectedCliente?.nome}</div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {CATALOGO_CATEGORIAS.map((cat) => {
+            const count = catalogoMidias.filter((m) => m.clienteId === selectedClienteId && m.categoria === cat).length;
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategoria(cat)}
+                className="rounded-2xl border p-4 text-left transition-colors hover:opacity-90"
+                style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}
+              >
+                <div className="venusex-eyebrow mb-1.5" style={{ color: theme.accent }}>{cat}</div>
+                <div className="venusex-nums text-sm" style={{ color: theme.inkSoft }}>{count} arquivo{count === 1 ? '' : 's'}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  const clientesOrdenados = [...catalogoClientes].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+
+  return (
+    <div className="pb-4">
+      <div className="flex gap-2 mb-4">
+        <TextInput
+          value={novoNome}
+          onChange={(e) => setNovoNome(e.target.value)}
+          placeholder="Nome do cliente"
+          onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
+        />
+        <button
+          onClick={handleAdd}
+          disabled={!novoNome.trim()}
+          className="shrink-0 px-4 rounded-xl font-semibold text-sm transition-opacity flex items-center justify-center"
+          style={{ backgroundColor: novoNome.trim() ? theme.primary : theme.border, color: novoNome.trim() ? '#FFFFFF' : theme.inkSoft }}
+        >
+          <PlusCircle size={18} />
+        </button>
+      </div>
+
+      {clientesOrdenados.length === 0 && (
+        <div className="text-center py-10 text-sm" style={{ color: theme.inkSoft }}>Nenhum cliente no catálogo ainda.</div>
+      )}
+
+      <div className="space-y-2">
+        {clientesOrdenados.map((c) => {
+          const count = catalogoMidias.filter((m) => m.clienteId === c.id).length;
+          return (
+            <div key={c.id} className="rounded-xl border px-4 py-3 flex items-center justify-between gap-2" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+              <button onClick={() => setSelectedClienteId(c.id)} className="flex-1 text-left min-w-0">
+                <div className="font-medium truncate" style={{ color: theme.ink }}>{c.nome}</div>
+                <div className="venusex-nums text-xs" style={{ color: theme.inkSoft }}>{count} arquivo{count === 1 ? '' : 's'}</div>
+              </button>
+              <ConfirmDeleteButton onConfirm={() => onDeleteCliente(c.id)} label="Excluir cliente do catálogo" />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -804,10 +956,10 @@ function NavItems({ tab, onSelect }) {
           <button
             key={t.key}
             onClick={() => onSelect(t.key)}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left"
+            className="venusex-label flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left"
             style={active
               ? { backgroundColor: 'rgba(255,255,255,0.14)', color: '#FFFFFF' }
-              : { backgroundColor: 'transparent', color: '#C9CFC9' }}
+              : { backgroundColor: 'transparent', color: '#B5B0A6' }}
           >
             <Icon size={19} />
             {t.label}
@@ -824,6 +976,7 @@ const TABS = [
   { key: 'vendas', label: 'Vendas', icon: ShoppingCart },
   { key: 'agendamentos', label: 'Agendamentos', icon: Calendar },
   { key: 'resumo', label: 'Resumo', icon: BarChart3 },
+  { key: 'catalogo', label: 'Catálogo', icon: Image },
 ];
 
 export default function App() {
@@ -835,17 +988,24 @@ export default function App() {
   const [tab, setTab] = useState('venda');
   const [toast, setToast] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [catalogoClientes, setCatalogoClientes] = useState([]);
+  const [catalogoMidias, setCatalogoMidias] = useState([]);
+  const [uploadingMidia, setUploadingMidia] = useState(false);
 
   const loadAll = useCallback(async (silent) => {
     if (!silent) setLoading(true);
     else setSyncing(true);
     try {
-      const [c, v] = await Promise.all([
+      const [c, v, cc, cm] = await Promise.all([
         fetchList(STORAGE_KEYS.clientes),
         fetchList(STORAGE_KEYS.vendas),
+        fetchList(CATALOGO_KEYS.clientes),
+        fetchList(CATALOGO_KEYS.midias),
       ]);
       setClientes(c);
       setVendas(v);
+      setCatalogoClientes(cc);
+      setCatalogoMidias(cm);
     } finally {
       setLoading(false);
       setSyncing(false);
@@ -945,6 +1105,82 @@ export default function App() {
     }
   }, []);
 
+  const handleAddCatalogoCliente = useCallback(async (nome) => {
+    try {
+      const fresh = await fetchList(CATALOGO_KEYS.clientes);
+      const updated = [...fresh, { id: uid(), nome, criadoEm: todayISO() }];
+      await storageSetWithRetry(CATALOGO_KEYS.clientes, updated);
+      setCatalogoClientes(updated);
+    } catch (e) {
+      setToast({ type: 'error', message: `Não foi possível adicionar o cliente (${e?.message || e}).` });
+    }
+  }, []);
+
+  const handleDeleteCatalogoCliente = useCallback(async (id) => {
+    try {
+      const freshMidias = await fetchList(CATALOGO_KEYS.midias);
+      const doCliente = freshMidias.filter((m) => m.clienteId === id);
+      await Promise.all(doCliente.map((m) =>
+        fetch('/api/blob-delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: m.url }),
+        }).catch(() => null)
+      ));
+      const updatedMidias = freshMidias.filter((m) => m.clienteId !== id);
+      await storageSetWithRetry(CATALOGO_KEYS.midias, updatedMidias);
+      setCatalogoMidias(updatedMidias);
+
+      const freshClientes = await fetchList(CATALOGO_KEYS.clientes);
+      const updatedClientes = freshClientes.filter((c) => c.id !== id);
+      await storageSetWithRetry(CATALOGO_KEYS.clientes, updatedClientes);
+      setCatalogoClientes(updatedClientes);
+      setToast({ type: 'success', message: 'Cliente e arquivos do catálogo excluídos.' });
+    } catch (e) {
+      setToast({ type: 'error', message: `Não foi possível excluir agora (${e?.message || e}).` });
+    }
+  }, []);
+
+  const handleUploadMidia = useCallback(async (file, clienteId, categoria) => {
+    setUploadingMidia(true);
+    try {
+      const blob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/blob-upload',
+      });
+      const tipo = file.type.startsWith('video') ? 'video' : 'image';
+      const fresh = await fetchList(CATALOGO_KEYS.midias);
+      const updated = [...fresh, {
+        id: uid(), clienteId, categoria, url: blob.url, tipo,
+        nomeArquivo: file.name, dataUpload: todayISO(),
+      }];
+      await storageSetWithRetry(CATALOGO_KEYS.midias, updated);
+      setCatalogoMidias(updated);
+      setToast({ type: 'success', message: 'Arquivo enviado com sucesso.' });
+    } catch (e) {
+      setToast({ type: 'error', message: `Não foi possível enviar o arquivo (${e?.message || e}).` });
+    } finally {
+      setUploadingMidia(false);
+    }
+  }, []);
+
+  const handleDeleteMidia = useCallback(async (midia) => {
+    try {
+      await fetch('/api/blob-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: midia.url }),
+      });
+      const fresh = await fetchList(CATALOGO_KEYS.midias);
+      const updated = fresh.filter((m) => m.id !== midia.id);
+      await storageSetWithRetry(CATALOGO_KEYS.midias, updated);
+      setCatalogoMidias(updated);
+      setToast({ type: 'success', message: 'Arquivo excluído.' });
+    } catch (e) {
+      setToast({ type: 'error', message: `Não foi possível excluir agora (${e?.message || e}).` });
+    }
+  }, []);
+
   const activeTabMeta = TABS.find((t) => t.key === tab);
 
   function selectTab(key) {
@@ -960,11 +1196,11 @@ export default function App() {
       <aside className="hidden md:flex md:flex-col w-64 shrink-0 sticky top-0 h-screen" style={{ backgroundColor: theme.primary }}>
         <div className="px-5 pt-6 pb-5 flex items-center gap-2">
           <Store size={20} style={{ color: theme.accent }} />
-          <span className="venusex-display text-lg font-semibold tracking-tight" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
+          <span className="venusex-display text-lg tracking-tight" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
         </div>
         <NavItems tab={tab} onSelect={selectTab} />
         <div className="px-3 pb-5 pt-3">
-          <button onClick={() => loadAll(true)} className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs" style={{ color: '#C9CFC9' }}>
+          <button onClick={() => loadAll(true)} className="venusex-label w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs" style={{ color: '#B5B0A6' }}>
             <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
             Atualizar dados
           </button>
@@ -978,10 +1214,10 @@ export default function App() {
         </button>
         <div className="flex items-center gap-2">
           <Store size={17} style={{ color: theme.accent }} />
-          <span className="venusex-display text-base font-semibold" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
+          <span className="venusex-display text-base" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
         </div>
         <button onClick={() => loadAll(true)} className="p-1 -mr-1">
-          <RefreshCw size={18} className={syncing ? 'animate-spin' : ''} style={{ color: '#C9CFC9' }} />
+          <RefreshCw size={18} className={syncing ? 'animate-spin' : ''} style={{ color: '#B5B0A6' }} />
         </button>
       </header>
 
@@ -993,10 +1229,10 @@ export default function App() {
             <div className="px-5 pt-6 pb-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Store size={20} style={{ color: theme.accent }} />
-                <span className="venusex-display text-lg font-semibold" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
+                <span className="venusex-display text-lg" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
               </div>
               <button onClick={() => setMenuOpen(false)} className="p-1">
-                <X size={20} style={{ color: '#C9CFC9' }} />
+                <X size={20} style={{ color: '#B5B0A6' }} />
               </button>
             </div>
             <NavItems tab={tab} onSelect={selectTab} />
@@ -1007,7 +1243,7 @@ export default function App() {
       {/* Content */}
       <main className="flex-1 min-w-0 px-5 pb-10 pt-20 md:pt-8 md:px-10">
         <div className="max-w-3xl mx-auto">
-          <div className="venusex-display text-xl font-semibold mb-4" style={{ color: theme.ink }}>{activeTabMeta?.label}</div>
+          <div className="venusex-display text-xl mb-4" style={{ color: theme.ink }}>{activeTabMeta?.label}</div>
           {loading ? (
             <div className="flex items-center justify-center py-24">
               <Loader2 size={22} className="animate-spin" style={{ color: theme.primary }} />
@@ -1019,6 +1255,17 @@ export default function App() {
               {tab === 'vendas' && <VendasTab vendas={vendas} onDelete={handleDeleteVenda} />}
               {tab === 'agendamentos' && <AgendamentosTab vendas={vendas} onTogglePagamento={handleTogglePagamento} />}
               {tab === 'resumo' && <ResumoTab vendas={vendas} />}
+              {tab === 'catalogo' && (
+                <CatalogoTab
+                  catalogoClientes={catalogoClientes}
+                  catalogoMidias={catalogoMidias}
+                  onAddCliente={handleAddCatalogoCliente}
+                  onDeleteCliente={handleDeleteCatalogoCliente}
+                  onUpload={handleUploadMidia}
+                  onDeleteMidia={handleDeleteMidia}
+                  uploading={uploadingMidia}
+                />
+              )}
             </>
           )}
         </div>
