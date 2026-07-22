@@ -14,13 +14,13 @@ import { upload } from '@vercel/blob/client';
 /* Design tokens                                                       */
 /* ------------------------------------------------------------------ */
 const theme = {
-  bg: '#EAE6DF',
+  bg: '#E8E4DE',
   surface: '#FDFCFA',
-  ink: '#1A1A17',
+  ink: '#1A1A1A',
   inkSoft: '#6B6862',
   border: '#DDD8CE',
-  primary: '#1A1A17',
-  primarySoft: '#33322E',
+  primary: '#B4C2DA',
+  primarySoft: '#C7D2E4',
   accent: '#A9905B',
   accentSoft: '#EDE6D6',
   success: '#6B8F71',
@@ -207,7 +207,7 @@ function Toast({ toast }) {
       style={{
         bottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
         backgroundColor: isError ? theme.danger : theme.primary,
-        color: '#FFFFFF',
+        color: isError ? '#FFFFFF' : theme.ink,
         maxWidth: '90vw',
       }}
     >
@@ -435,7 +435,7 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
               onClick={() => setModalidade(p)}
               className="venusex-label px-3 py-1.5 rounded-full text-sm font-medium border transition-colors"
               style={modalidade === p
-                ? { backgroundColor: theme.primary, color: '#FFF', borderColor: theme.primary }
+                ? { backgroundColor: theme.primary, color: theme.ink, borderColor: theme.primary }
                 : { backgroundColor: '#FFF', color: theme.ink, borderColor: theme.border }}
             >
               {p}
@@ -452,7 +452,7 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
               onClick={() => setParcelado(opt.v)}
               className="venusex-label flex-1 py-2 rounded-xl text-sm font-medium border transition-colors"
               style={parcelado === opt.v
-                ? { backgroundColor: theme.primary, color: '#FFF', borderColor: theme.primary }
+                ? { backgroundColor: theme.primary, color: theme.ink, borderColor: theme.primary }
                 : { backgroundColor: '#FFF', color: theme.ink, borderColor: theme.border }}
             >
               {opt.l}
@@ -594,7 +594,7 @@ function VendasTab({ vendas, onDelete }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="venusex-nums font-semibold" style={{ color: theme.primary }}>{formatBRL(v.valorVenda)}</div>
+              <div className="venusex-nums font-semibold" style={{ color: theme.ink }}>{formatBRL(v.valorVenda)}</div>
               <ConfirmDeleteButton onConfirm={() => onDelete(v.id)} label="Excluir venda" />
             </div>
           </div>
@@ -664,7 +664,7 @@ function AgendamentosTab({ vendas, onTogglePagamento }) {
             onClick={() => setShowAll(opt.v)}
             className="venusex-label flex-1 py-2 rounded-xl text-sm font-medium border transition-colors"
             style={showAll === opt.v
-              ? { backgroundColor: theme.primary, color: '#FFF', borderColor: theme.primary }
+              ? { backgroundColor: theme.primary, color: theme.ink, borderColor: theme.primary }
               : { backgroundColor: '#FFF', color: theme.ink, borderColor: theme.border }}
           >
             {opt.l}
@@ -702,7 +702,7 @@ function AgendamentosTab({ vendas, onTogglePagamento }) {
                 </div>
               </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
-                <div className="venusex-nums font-semibold" style={{ color: theme.primary }}>{formatBRL(it.valor)}</div>
+                <div className="venusex-nums font-semibold" style={{ color: theme.ink }}>{formatBRL(it.valor)}</div>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: s.backgroundColor, color: s.color }}>{s.label}</span>
               </div>
             </div>
@@ -751,7 +751,7 @@ function ResumoTab({ vendas }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="rounded-2xl p-4" style={{ backgroundColor: theme.primary, color: '#FFFFFF' }}>
+        <div className="rounded-2xl p-4" style={{ backgroundColor: theme.primary, color: theme.ink }}>
           <div className="venusex-eyebrow opacity-70 mb-1">Valor arrecadado</div>
           <div className="venusex-display venusex-nums text-2xl font-semibold">{formatBRL(total)}</div>
         </div>
@@ -787,7 +787,7 @@ function ResumoTab({ vendas }) {
         className="venusex-label w-full mb-4 py-3 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-opacity"
         style={{
           backgroundColor: filtered.length > 0 ? theme.primary : theme.border,
-          color: filtered.length > 0 ? '#FFFFFF' : theme.inkSoft,
+          color: theme.ink,
         }}
       >
         <Download size={18} />
@@ -915,7 +915,7 @@ function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteC
           onClick={handleAdd}
           disabled={!novoNome.trim()}
           className="shrink-0 px-4 rounded-xl font-semibold text-sm transition-opacity flex items-center justify-center"
-          style={{ backgroundColor: novoNome.trim() ? theme.primary : theme.border, color: novoNome.trim() ? '#FFFFFF' : theme.inkSoft }}
+          style={{ backgroundColor: novoNome.trim() ? theme.primary : theme.border, color: theme.ink }}
         >
           <PlusCircle size={18} />
         </button>
@@ -965,8 +965,8 @@ function NavItems({ tab, onSelect }) {
             onClick={() => onSelect(t.key)}
             className="venusex-label flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left"
             style={active
-              ? { backgroundColor: 'rgba(255,255,255,0.14)', color: '#FFFFFF' }
-              : { backgroundColor: 'transparent', color: '#B5B0A6' }}
+              ? { backgroundColor: 'rgba(26,26,26,0.1)', color: theme.ink }
+              : { backgroundColor: 'transparent', color: theme.inkSoft }}
           >
             <Icon size={19} />
             {t.label}
@@ -1203,14 +1203,14 @@ export default function App() {
       {/* Top bar */}
       <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-between" style={{ backgroundColor: theme.primary }}>
         <button onClick={() => setMenuOpen(true)} className="p-1 -ml-1">
-          <Menu size={22} style={{ color: '#FFFFFF' }} />
+          <Menu size={22} style={{ color: theme.ink }} />
         </button>
         <div className="flex items-center gap-2">
           <Store size={17} style={{ color: theme.accent }} />
-          <span className="venusex-display text-base" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
+          <span className="venusex-display text-base" style={{ color: theme.ink }}>Vênus Ex.</span>
         </div>
         <button onClick={() => loadAll(true)} className="p-1 -mr-1">
-          <RefreshCw size={18} className={syncing ? 'animate-spin' : ''} style={{ color: '#B5B0A6' }} />
+          <RefreshCw size={18} className={syncing ? 'animate-spin' : ''} style={{ color: theme.ink }} />
         </button>
       </header>
 
@@ -1222,15 +1222,15 @@ export default function App() {
             <div className="px-5 pt-6 pb-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Store size={20} style={{ color: theme.accent }} />
-                <span className="venusex-display text-lg" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
+                <span className="venusex-display text-lg" style={{ color: theme.ink }}>Vênus Ex.</span>
               </div>
               <button onClick={() => setMenuOpen(false)} className="p-1">
-                <X size={20} style={{ color: '#B5B0A6' }} />
+                <X size={20} style={{ color: theme.ink }} />
               </button>
             </div>
             <NavItems tab={tab} onSelect={selectTab} />
             <div className="px-3 pb-5 pt-3">
-              <button onClick={() => loadAll(true)} className="venusex-label w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs" style={{ color: '#B5B0A6' }}>
+              <button onClick={() => loadAll(true)} className="venusex-label w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs" style={{ color: theme.ink }}>
                 <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
                 Atualizar dados
               </button>
