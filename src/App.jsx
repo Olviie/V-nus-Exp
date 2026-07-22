@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Users, ShoppingCart, BarChart3, PlusCircle, Search, Check,
   AlertTriangle, X, Loader2, Trash2, ChevronDown, ChevronUp, Store, RefreshCw, Calendar,
-  Menu, Download, Image, Upload, ChevronLeft
+  Menu, Download, Image, Upload, ChevronLeft, Home
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
@@ -944,6 +944,13 @@ function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteC
 }
 
 /* ------------------------------------------------------------------ */
+/* Início tab                                                           */
+/* ------------------------------------------------------------------ */
+function InicioTab() {
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
 /* App shell                                                            */
 /* ------------------------------------------------------------------ */
 function NavItems({ tab, onSelect }) {
@@ -971,6 +978,7 @@ function NavItems({ tab, onSelect }) {
 }
 
 const TABS = [
+  { key: 'inicio', label: 'Início', icon: Home },
   { key: 'venda', label: 'Nova venda', icon: PlusCircle },
   { key: 'clientes', label: 'Clientes', icon: Users },
   { key: 'vendas', label: 'Vendas', icon: ShoppingCart },
@@ -985,7 +993,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState('venda');
+  const [tab, setTab] = useState('inicio');
   const [toast, setToast] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [catalogoClientes, setCatalogoClientes] = useState([]);
@@ -1189,26 +1197,11 @@ export default function App() {
   }
 
   return (
-    <div className="venusex-root min-h-screen flex" style={{ backgroundColor: theme.bg }}>
+    <div className="venusex-root min-h-screen" style={{ backgroundColor: theme.bg }}>
       <style>{FONTS}</style>
 
-      {/* Sidebar — desktop */}
-      <aside className="hidden md:flex md:flex-col w-64 shrink-0 sticky top-0 h-screen" style={{ backgroundColor: theme.primary }}>
-        <div className="px-5 pt-6 pb-5 flex items-center gap-2">
-          <Store size={20} style={{ color: theme.accent }} />
-          <span className="venusex-display text-lg tracking-tight" style={{ color: '#FFFFFF' }}>Vênus Ex.</span>
-        </div>
-        <NavItems tab={tab} onSelect={selectTab} />
-        <div className="px-3 pb-5 pt-3">
-          <button onClick={() => loadAll(true)} className="venusex-label w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs" style={{ color: '#B5B0A6' }}>
-            <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
-            Atualizar dados
-          </button>
-        </div>
-      </aside>
-
-      {/* Top bar — mobile */}
-      <header className="md:hidden fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-between" style={{ backgroundColor: theme.primary }}>
+      {/* Top bar */}
+      <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-between" style={{ backgroundColor: theme.primary }}>
         <button onClick={() => setMenuOpen(true)} className="p-1 -ml-1">
           <Menu size={22} style={{ color: '#FFFFFF' }} />
         </button>
@@ -1221,9 +1214,9 @@ export default function App() {
         </button>
       </header>
 
-      {/* Drawer — mobile */}
+      {/* Retractable menu */}
       {menuOpen && (
-        <div className="md:hidden fixed inset-0 z-50">
+        <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMenuOpen(false)} />
           <aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col" style={{ backgroundColor: theme.primary }}>
             <div className="px-5 pt-6 pb-5 flex items-center justify-between">
@@ -1236,12 +1229,18 @@ export default function App() {
               </button>
             </div>
             <NavItems tab={tab} onSelect={selectTab} />
+            <div className="px-3 pb-5 pt-3">
+              <button onClick={() => loadAll(true)} className="venusex-label w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs" style={{ color: '#B5B0A6' }}>
+                <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
+                Atualizar dados
+              </button>
+            </div>
           </aside>
         </div>
       )}
 
       {/* Content */}
-      <main className="flex-1 min-w-0 px-5 pb-10 pt-20 md:pt-8 md:px-10">
+      <main className="px-5 pb-10 pt-20 md:px-10">
         <div className="max-w-3xl mx-auto">
           <div className="venusex-display text-xl mb-4" style={{ color: theme.ink }}>{activeTabMeta?.label}</div>
           {loading ? (
@@ -1250,6 +1249,7 @@ export default function App() {
             </div>
           ) : (
             <>
+              {tab === 'inicio' && <InicioTab />}
               {tab === 'venda' && <NovaVendaTab clientes={clientes} onSalvar={handleSalvar} saving={saving} />}
               {tab === 'clientes' && <ClientesTab clientes={clientes} onDelete={handleDeleteCliente} />}
               {tab === 'vendas' && <VendasTab vendas={vendas} onDelete={handleDeleteVenda} />}
