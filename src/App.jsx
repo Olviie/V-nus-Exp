@@ -963,7 +963,6 @@ function NavItems({ tab, onSelect }) {
           <button
             key={t.key}
             onClick={() => onSelect(t.key)}
-            className="venusex-label flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left"
             style={active
               ? { backgroundColor: 'rgba(26,26,26,0.1)', color: theme.ink }
               : { backgroundColor: 'transparent', color: theme.inkSoft }}
