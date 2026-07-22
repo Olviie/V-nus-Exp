@@ -1150,12 +1150,19 @@ export default function App() {
   }, []);
 
   const handleUploadMidia = useCallback(async (file, clienteId, categoria) => {
+    if (!clienteId || !categoria) {
+      setToast({ type: 'error', message: 'Selecione um cliente e uma categoria antes de enviar.' });
+      return;
+    }
     setUploadingMidia(true);
     try {
       const blob = await upload(file.name, file, {
         access: 'public',
         handleUploadUrl: '/api/blob-upload',
       });
+      if (!blob || !blob.url) {
+        throw new Error('URL do arquivo não recebida do servidor.');
+      }
       const tipo = file.type.startsWith('video') ? 'video' : 'image';
       const fresh = await fetchList(CATALOGO_KEYS.midias);
       const updated = [...fresh, {
@@ -1166,7 +1173,12 @@ export default function App() {
       setCatalogoMidias(updated);
       setToast({ type: 'success', message: 'Arquivo enviado com sucesso.' });
     } catch (e) {
-      setToast({ type: 'error', message: `Não foi possível enviar o arquivo (${e?.message || e}).` });
+      const msg = e?.message || String(e);
+      if (msg.includes('token') || msg.includes('401') || msg.includes('403')) {
+        setToast({ type: 'error', message: 'Erro de autenticação no upload. Verifique as variáveis de ambiente do Vercel Blob.' });
+      } else {
+        setToast({ type: 'error', message: `Não foi possível enviar o arquivo: ${msg}` });
+      }
     } finally {
       setUploadingMidia(false);
     }
