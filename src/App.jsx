@@ -223,9 +223,9 @@ function readFileAsDataUrl(file) {
 function Field({ label, children, hint }) {
   return (
     <label className="block mb-4">
-      <span className="venusex-label block text-sm font-medium mb-1.5" style={{ color: theme.ink }}>{label}</span>
+      <span className="venusex-label block text-sm font-semibold mb-1.5" style={{ color: theme.ink }}>{label}</span>
       {children}
-      {hint && <span className="block text-xs mt-1" style={{ color: theme.inkSoft }}>{hint}</span>}
+      {hint && <span className="block text-xs mt-1.5" style={{ color: theme.inkSoft }}>{hint}</span>}
     </label>
   );
 }
@@ -381,7 +381,7 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
   return (
     <div className="pb-4">
       {/* Status card — the signature element: mirrors the client-lookup check from the spreadsheet */}
-      <div className="mb-5 rounded-3xl border p-4" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
+      <div className="mb-5 rounded-[28px] border p-4" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
         <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>Cliente</div>
         <div className="relative">
           <div className="flex items-center gap-2 rounded-2xl border px-3.5 py-2.5" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
@@ -440,7 +440,7 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
 
       {/* New client fields */}
       {isNovoCliente && (
-        <div className="mb-6 rounded-2xl border-2 border-dashed p-4" style={{ borderColor: theme.accent, backgroundColor: '#FFFEFB' }}>
+        <div className="mb-6 rounded-[24px] border-2 border-dashed p-4" style={{ borderColor: theme.accent, backgroundColor: '#FFFEFB' }}>
           <div className="venusex-eyebrow mb-3" style={{ color: theme.accent }}>Cadastro do novo cliente</div>
           <Field label="Nome Fantasia" hint="Confira ou corrija antes de gravar.">
             <TextInput value={nomeFantasia} onChange={(e) => handleNomeChange(e.target.value)} />
@@ -559,24 +559,24 @@ function ClientesTab({ clientes, onDelete }) {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-10 text-sm" style={{ color: theme.inkSoft }}>
+        <div className="text-center py-10 px-4 rounded-[24px] border" style={{ color: theme.inkSoft, ...cardStyle, backgroundColor: '#FFFDF9' }}>
           {clientes.length === 0 ? 'Nenhum cliente cadastrado ainda. Registre a primeira venda para começar.' : 'Nenhum cliente encontrado.'}
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {filtered.map((c) => (
-          <div key={c.codigo} className="overflow-hidden rounded-2xl border" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
-            <div className="w-full flex items-center justify-between px-4 py-3 gap-2">
+          <div key={c.codigo} className="overflow-hidden rounded-[24px] border" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+            <div className="w-full flex items-center justify-between px-4 py-3.5 gap-2">
               <button onClick={() => setOpen(open === c.codigo ? null : c.codigo)} className="flex-1 text-left flex items-center gap-2 min-w-0">
                 <div className="min-w-0">
-                  <div className="font-medium truncate" style={{ color: theme.ink }}>{c.nomeFantasia}</div>
-                  <div className="text-xs venusex-nums" style={{ color: theme.inkSoft }}>#{c.codigo} · {c.representante || 'sem representante'}</div>
+                  <div className="font-semibold truncate" style={{ color: theme.ink }}>{c.nomeFantasia}</div>
+                  <div className="text-xs venusex-nums mt-1" style={{ color: theme.inkSoft }}>#{c.codigo} · {c.representante || 'sem representante'}</div>
                 </div>
               </button>
               <div className="flex items-center gap-1 shrink-0">
                 <ConfirmDeleteButton onConfirm={() => onDelete(c.codigo)} label="Excluir cliente" />
-                <button onClick={() => setOpen(open === c.codigo ? null : c.codigo)} className="p-1">
+                <button onClick={() => setOpen(open === c.codigo ? null : c.codigo)} className="p-1.5 rounded-full" style={{ backgroundColor: theme.accentSoft }}>
                   {open === c.codigo ? <ChevronUp size={18} style={{ color: theme.inkSoft }} /> : <ChevronDown size={18} style={{ color: theme.inkSoft }} />}
                 </button>
               </div>
@@ -622,22 +622,22 @@ function VendasTab({ vendas, onDelete }) {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-10 text-sm" style={{ color: theme.inkSoft }}>
+        <div className="text-center py-10 px-4 rounded-[24px] border" style={{ color: theme.inkSoft, ...cardStyle, backgroundColor: '#FFFDF9' }}>
           {vendas.length === 0 ? 'Nenhuma venda registrada ainda.' : 'Nenhuma venda encontrada.'}
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {filtered.map((v) => (
-          <div key={v.id} className="rounded-2xl border px-4 py-3 flex items-center justify-between" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
-            <div>
-              <div className="font-medium" style={{ color: theme.ink }}>{v.nomeFantasia}</div>
-              <div className="text-xs" style={{ color: theme.inkSoft }}>
+          <div key={v.id} className="rounded-[24px] border px-4 py-3.5 flex items-center justify-between gap-3" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+            <div className="min-w-0">
+              <div className="font-semibold truncate" style={{ color: theme.ink }}>{v.nomeFantasia}</div>
+              <div className="text-xs mt-1" style={{ color: theme.inkSoft }}>
                 {formatDateBR(v.dataVenda)} · {v.modalidadePagamento}
                 {v.parcelamento && ` · ${v.qtdParcelas}x`}
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
               <div className="venusex-nums font-semibold" style={{ color: theme.ink }}>{formatBRL(v.valorVenda)}</div>
               <ConfirmDeleteButton onConfirm={() => onDelete(v.id)} label="Excluir venda" />
             </div>
@@ -717,16 +717,16 @@ function AgendamentosTab({ vendas, onTogglePagamento }) {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-10 text-sm" style={{ color: theme.inkSoft }}>
+        <div className="text-center py-10 px-4 rounded-[24px] border" style={{ color: theme.inkSoft, ...cardStyle, backgroundColor: '#FFFDF9' }}>
           {items.length === 0 ? 'Nenhuma cobrança agendada. Vendas parceladas aparecem aqui automaticamente.' : 'Nenhuma cobrança encontrada.'}
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {filtered.map((it) => {
           const s = statusStyle[it.status];
           return (
-            <div key={`${it.vendaId}_${it.parcelaIndex}`} className="rounded-2xl border px-4 py-3 flex items-center justify-between gap-2" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+            <div key={`${it.vendaId}_${it.parcelaIndex}`} className="rounded-[24px] border px-4 py-3.5 flex items-center justify-between gap-2" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   onClick={() => onTogglePagamento(it.vendaId, it.parcelaIndex)}
@@ -967,14 +967,14 @@ function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteC
       </div>
 
       {clientesOrdenados.length === 0 && (
-        <div className="text-center py-10 text-sm" style={{ color: theme.inkSoft }}>Nenhum cliente no catálogo ainda.</div>
+        <div className="text-center py-10 px-4 rounded-[24px] border" style={{ color: theme.inkSoft, ...cardStyle, backgroundColor: '#FFFDF9' }}>Nenhum cliente no catálogo ainda.</div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {clientesOrdenados.map((c) => {
           const count = catalogoMidias.filter((m) => m.clienteId === c.id).length;
           return (
-            <div key={c.id} className="rounded-2xl border px-4 py-3 flex items-center justify-between gap-2" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+            <div key={c.id} className="rounded-[24px] border px-4 py-3.5 flex items-center justify-between gap-2" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
               <button onClick={() => setSelectedClienteId(c.id)} className="flex-1 text-left min-w-0">
                 <div className="font-medium truncate" style={{ color: theme.ink }}>{c.nome}</div>
                 <div className="venusex-nums text-xs" style={{ color: theme.inkSoft }}>{count} arquivo{count === 1 ? '' : 's'}</div>
@@ -1003,17 +1003,20 @@ function InicioTab({ clientes, vendas }) {
 
   return (
     <div className="pb-4 space-y-4">
-      <div className="rounded-[28px] border p-5" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
+      <div className="rounded-[32px] border p-5" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
         <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>Resumo</div>
         <div className="venusex-display text-2xl mb-2" style={{ color: theme.ink }}>Seu fluxo de venda, em um só lugar.</div>
         <p className="text-sm leading-6" style={{ color: theme.inkSoft }}>
           Acompanhe clientes, vendas e cobranças com uma experiência mais clara, elegante e alinhada à sua marca.
         </p>
+        <div className="mt-4 inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium" style={{ backgroundColor: theme.primarySoft, color: theme.ink }}>
+          Comunicação limpa, impacto sutil e presença real
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {cards.map((card) => (
-          <div key={card.label} className="rounded-2xl border p-4" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+          <div key={card.label} className="rounded-[24px] border p-4" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
             <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>{card.label}</div>
             <div className="venusex-display text-2xl" style={{ color: theme.ink }}>{card.value}</div>
             <div className="text-sm" style={{ color: theme.inkSoft }}>{card.hint}</div>
