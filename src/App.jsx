@@ -14,27 +14,33 @@ import { upload } from '@vercel/blob/client';
 /* Design tokens                                                       */
 /* ------------------------------------------------------------------ */
 const theme = {
-  bg: '#E8E4DE',
-  surface: '#FDFCFA',
-  ink: '#1A1A1A',
-  inkSoft: '#6B6862',
-  border: '#DDD8CE',
-  primary: '#B4C2DA',
-  primarySoft: '#C7D2E4',
-  accent: '#A9905B',
-  accentSoft: '#EDE6D6',
-  success: '#6B8F71',
-  successSoft: '#E7EEE7',
-  danger: '#B5654F',
-  dangerSoft: '#F3E6E1',
+  bg: '#F4EEE8',
+  surface: '#FCFAF6',
+  ink: '#1F1A17',
+  inkSoft: '#7A736D',
+  border: '#E8DED3',
+  primary: '#A8895F',
+  primarySoft: '#EEDFCF',
+  accent: '#6F695F',
+  accentSoft: '#F0E8DD',
+  success: '#5C7657',
+  successSoft: '#E8F0E7',
+  danger: '#A65447',
+  dangerSoft: '#F8E7E1',
+};
+
+const cardStyle = {
+  backgroundColor: theme.surface,
+  border: `1px solid ${theme.border}`,
+  boxShadow: '0 12px 30px rgba(31, 26, 23, 0.06)',
 };
 
 const FONTS = `
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap');
-.venusex-root { font-family: 'Jost', system-ui, sans-serif; }
-.venusex-display { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; text-transform: lowercase; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+.venusex-root { font-family: 'Inter', system-ui, sans-serif; }
+.venusex-display { font-family: 'Inter', system-ui, sans-serif; font-weight: 600; text-transform: lowercase; letter-spacing: -0.01em; }
 .venusex-nums { font-variant-numeric: tabular-nums; }
-.venusex-eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: lowercase; font-weight: 500; }
+.venusex-eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: lowercase; font-weight: 600; }
 .venusex-label { text-transform: lowercase; letter-spacing: 0.03em; }
 input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.6; }
 `;
@@ -228,10 +234,10 @@ function TextInput(props) {
   return (
     <input
       {...props}
-      className={`w-full rounded-xl border px-3.5 py-2.5 text-[15px] outline-none transition-colors focus:ring-2 ${props.className || ''}`}
-      style={{ borderColor: theme.border, backgroundColor: '#FFFFFF', color: theme.ink, ...(props.style || {}) }}
-      onFocus={(e) => { e.target.style.borderColor = theme.primary; if (props.onFocus) props.onFocus(e); }}
-      onBlur={(e) => { e.target.style.borderColor = theme.border; if (props.onBlur) props.onBlur(e); }}
+      className={`w-full rounded-2xl border px-3.5 py-2.5 text-[15px] outline-none transition-all focus:ring-2 ${props.className || ''}`}
+      style={{ borderColor: theme.border, backgroundColor: theme.surface, color: theme.ink, boxShadow: '0 6px 18px rgba(31, 26, 23, 0.04)', ...(props.style || {}) }}
+      onFocus={(e) => { e.target.style.borderColor = theme.primary; e.target.style.boxShadow = '0 0 0 3px rgba(168, 137, 95, 0.18)'; if (props.onFocus) props.onFocus(e); }}
+      onBlur={(e) => { e.target.style.borderColor = theme.border; e.target.style.boxShadow = '0 6px 18px rgba(31, 26, 23, 0.04)'; if (props.onBlur) props.onBlur(e); }}
     />
   );
 }
@@ -375,10 +381,10 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
   return (
     <div className="pb-4">
       {/* Status card — the signature element: mirrors the client-lookup check from the spreadsheet */}
-      <div className="mb-5">
+      <div className="mb-5 rounded-3xl border p-4" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
         <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>Cliente</div>
         <div className="relative">
-          <div className="flex items-center gap-2 rounded-xl border px-3.5 py-2.5" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+          <div className="flex items-center gap-2 rounded-2xl border px-3.5 py-2.5" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
             <Search size={17} style={{ color: theme.inkSoft }} />
             <input
               value={nomeFantasia}
@@ -520,8 +526,8 @@ function NovaVendaTab({ clientes, onSalvar, saving }) {
       <button
         onClick={handleSubmit}
         disabled={!canSubmit || saving}
-        className="venusex-label w-full mt-2 py-3.5 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-opacity"
-        style={{ backgroundColor: canSubmit ? theme.accent : theme.border, color: canSubmit ? '#FFFFFF' : theme.inkSoft, opacity: saving ? 0.7 : 1 }}
+        className="venusex-label w-full mt-3 py-3.75 rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-all"
+        style={{ background: canSubmit ? `linear-gradient(135deg, ${theme.primary}, ${theme.accent})` : theme.border, color: canSubmit ? '#FFFFFF' : theme.inkSoft, opacity: saving ? 0.7 : 1, boxShadow: canSubmit ? '0 12px 24px rgba(111, 105, 95, 0.24)' : 'none' }}
       >
         {saving ? <Loader2 size={18} className="animate-spin" /> : <PlusCircle size={18} />}
         Gravar informações
@@ -560,7 +566,7 @@ function ClientesTab({ clientes, onDelete }) {
 
       <div className="space-y-2">
         {filtered.map((c) => (
-          <div key={c.codigo} className="rounded-xl border overflow-hidden" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+          <div key={c.codigo} className="overflow-hidden rounded-2xl border" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
             <div className="w-full flex items-center justify-between px-4 py-3 gap-2">
               <button onClick={() => setOpen(open === c.codigo ? null : c.codigo)} className="flex-1 text-left flex items-center gap-2 min-w-0">
                 <div className="min-w-0">
@@ -623,7 +629,7 @@ function VendasTab({ vendas, onDelete }) {
 
       <div className="space-y-2">
         {filtered.map((v) => (
-          <div key={v.id} className="rounded-xl border px-4 py-3 flex items-center justify-between" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+          <div key={v.id} className="rounded-2xl border px-4 py-3 flex items-center justify-between" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
             <div>
               <div className="font-medium" style={{ color: theme.ink }}>{v.nomeFantasia}</div>
               <div className="text-xs" style={{ color: theme.inkSoft }}>
@@ -720,7 +726,7 @@ function AgendamentosTab({ vendas, onTogglePagamento }) {
         {filtered.map((it) => {
           const s = statusStyle[it.status];
           return (
-            <div key={`${it.vendaId}_${it.parcelaIndex}`} className="rounded-xl border px-4 py-3 flex items-center justify-between gap-2" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+            <div key={`${it.vendaId}_${it.parcelaIndex}`} className="rounded-2xl border px-4 py-3 flex items-center justify-between gap-2" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   onClick={() => onTogglePagamento(it.vendaId, it.parcelaIndex)}
@@ -799,7 +805,7 @@ function ResumoTab({ vendas }) {
         </div>
       </div>
 
-      <div className="rounded-2xl border p-4 mb-4" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+      <div className="rounded-3xl border p-4 mb-4" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
         <div className="venusex-eyebrow mb-3" style={{ color: theme.accent }}>Vendas por mês</div>
         {chartData.length === 0 ? (
           <div className="text-sm text-center py-8" style={{ color: theme.inkSoft }}>Sem dados no período selecionado.</div>
@@ -967,7 +973,7 @@ function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteC
         {clientesOrdenados.map((c) => {
           const count = catalogoMidias.filter((m) => m.clienteId === c.id).length;
           return (
-            <div key={c.id} className="rounded-xl border px-4 py-3 flex items-center justify-between gap-2" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+            <div key={c.id} className="rounded-2xl border px-4 py-3 flex items-center justify-between gap-2" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
               <button onClick={() => setSelectedClienteId(c.id)} className="flex-1 text-left min-w-0">
                 <div className="font-medium truncate" style={{ color: theme.ink }}>{c.nome}</div>
                 <div className="venusex-nums text-xs" style={{ color: theme.inkSoft }}>{count} arquivo{count === 1 ? '' : 's'}</div>
@@ -984,8 +990,37 @@ function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteC
 /* ------------------------------------------------------------------ */
 /* Início tab                                                           */
 /* ------------------------------------------------------------------ */
-function InicioTab() {
-  return null;
+function InicioTab({ clientes, vendas }) {
+  const agendamentos = useMemo(() => buildAgendamentos(vendas), [vendas]);
+  const proximas = agendamentos.filter((item) => item.status === 'proxima' || item.status === 'vencida').length;
+
+  const cards = [
+    { label: 'Clientes', value: clientes.length, hint: 'cadastrados' },
+    { label: 'Vendas', value: vendas.length, hint: 'registradas' },
+    { label: 'Cobranças', value: proximas, hint: 'pendentes' },
+  ];
+
+  return (
+    <div className="pb-4 space-y-4">
+      <div className="rounded-[28px] border p-5" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
+        <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>Visão geral</div>
+        <div className="venusex-display text-2xl mb-2" style={{ color: theme.ink }}>Seu fluxo de venda, em um só lugar.</div>
+        <p className="text-sm leading-6" style={{ color: theme.inkSoft }}>
+          Acompanhe clientes, vendas e cobranças com uma experiência mais clara, elegante e alinhada à sua marca.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {cards.map((card) => (
+          <div key={card.label} className="rounded-2xl border p-4" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+            <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>{card.label}</div>
+            <div className="venusex-display text-2xl" style={{ color: theme.ink }}>{card.value}</div>
+            <div className="text-sm" style={{ color: theme.inkSoft }}>{card.hint}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -1011,11 +1046,11 @@ function NavItems({ tab, onSelect }) {
           <button
             key={t.key}
             onClick={() => onSelect(t.key)}
-            className="venusex-label flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors text-left"
+            className="venusex-label flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold transition-all text-left"
             style={
               active
-                ? { backgroundColor: 'rgba(26, 26, 26, 0.08)', color: theme.ink }
-                : { color: theme.ink }
+                ? { backgroundColor: theme.primarySoft, color: theme.ink, boxShadow: 'inset 0 0 0 1px rgba(168, 137, 95, 0.2)' }
+                : { color: theme.ink, backgroundColor: 'transparent' }
             }
           >
             <Icon size={17} />
@@ -1261,7 +1296,7 @@ export default function App() {
       <style>{FONTS}</style>
 
       {/* Top bar */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-between" style={{ backgroundColor: theme.primary }}>
+      <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-between border-b" style={{ backgroundColor: theme.surface, borderColor: theme.border, boxShadow: '0 8px 24px rgba(31, 26, 23, 0.05)' }}>
         <button onClick={() => setMenuOpen(true)} className="p-1 -ml-1">
           <Menu size={22} style={{ color: theme.ink }} />
         </button>
@@ -1278,7 +1313,7 @@ export default function App() {
       {menuOpen && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMenuOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col" style={{ backgroundColor: theme.primary }}>
+          <aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r" style={{ backgroundColor: theme.surface, borderColor: theme.border, boxShadow: '16px 0 40px rgba(31, 26, 23, 0.06)' }}>
             <div className="px-5 pt-6 pb-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Store size={20} style={{ color: theme.accent }} />
@@ -1309,7 +1344,7 @@ export default function App() {
             </div>
           ) : (
             <>
-              {tab === 'inicio' && <InicioTab />}
+              {tab === 'inicio' && <InicioTab clientes={clientes} vendas={vendas} />}
               {tab === 'venda' && <NovaVendaTab clientes={clientes} onSalvar={handleSalvar} saving={saving} />}
               {tab === 'clientes' && <ClientesTab clientes={clientes} onDelete={handleDeleteCliente} />}
               {tab === 'vendas' && <VendasTab vendas={vendas} onDelete={handleDeleteVenda} />}
