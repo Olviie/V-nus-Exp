@@ -143,7 +143,11 @@ function exportarVendasExcel(vendas, dataInicial, dataFinal) {
 }
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
-/* Persistência compartilhada via /api/storage (Vercel KV) */
+/* Persistência compartilhada via /api/storage (Vercel KV) com fallback local */
+function getStorageBucketKey(key) {
+  return `venusex:${key}`;
+}
+
 async function storageSetWithRetry(key, value, attempts = 3) {
   let lastErr = null;
   for (let i = 0; i < attempts; i++) {
@@ -160,17 +164,51 @@ async function storageSetWithRetry(key, value, attempts = 3) {
     }
     if (i < attempts - 1) await sleep(400 * (i + 1));
   }
+
+  if (typeof window !== 'undefined') {
+    try {
+      window.localStorage.setItem(getStorageBucketKey(key), JSON.stringify(value));
+      return true;
+    } catch (storageErr) {
+      lastErr = storageErr;
+    }
+  }
+
   throw lastErr;
 }
+
 async function fetchList(key) {
   try {
     const r = await fetch(`/api/storage?key=${encodeURIComponent(key)}`);
-    if (!r.ok) return [];
-    const data = await r.json();
-    return Array.isArray(data.value) ? data.value : [];
+    if (r.ok) {
+      const data = await r.json();
+      if (Array.isArray(data.value)) return data.value;
+    }
   } catch (e) {
-    return [];
+    // fallback abaixo
   }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = window.localStorage.getItem(getStorageBucketKey(key));
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Não foi possível ler o arquivo selecionado.'));
+    reader.readAsDataURL(file);
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -953,25 +991,41 @@ function InicioTab() {
 /* ------------------------------------------------------------------ */
 /* App shell                                                            */
 /* ------------------------------------------------------------------ */
-function NavItems({ tab, onSelect }) {
-  return (
-    <nav className="flex-1 flex flex-col gap-1 px-3">
-      {TABS.map((t) => {
-        const Icon = t.icon;
-        const active = tab === t.key;
-return (
-          <button
-            key={t.key}
-            onClick={() => onSelect(t.key)}
-            className="venusex-label flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors text-left"
-style={active
-              ? { backgroundColor: 'rgba(26,26
+const TABS = [
+  { key: 'inicio', label: 'Início', icon: Home },
+  { key: 'venda', label: 'Nova venda', icon: PlusCircle },
   { key: 'clientes', label: 'Clientes', icon: Users },
   { key: 'vendas', label: 'Vendas', icon: ShoppingCart },
   { key: 'agendamentos', label: 'Agendamentos', icon: Calendar },
   { key: 'resumo', label: 'Resumo', icon: BarChart3 },
   { key: 'catalogo', label: 'Catálogo', icon: Image },
 ];
+
+function NavItems({ tab, onSelect }) {
+  return (
+    <nav className="flex-1 flex flex-col gap-1 px-3">
+      {TABS.map((t) => {
+        const Icon = t.icon;
+        const active = tab === t.key;
+        return (
+          <button
+            key={t.key}
+            onClick={() => onSelect(t.key)}
+            className="venusex-label flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors text-left"
+            style={
+              active
+                ? { backgroundColor: 'rgba(26, 26, 26, 0.08)', color: theme.ink }
+                : { color: theme.ink }
+            }
+          >
+            <Icon size={17} />
+            <span>{t.label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
 
 export default function App() {
   const [clientes, setClientes] = useState([]);
@@ -1142,22 +1196,30 @@ export default function App() {
     }
     setUploadingMidia(true);
     try {
-      const blob = await upload(file.name, file, {
-        access: 'public',
-        handleUploadUrl: '/api/blob-upload',
-      });
-      if (!blob || !blob.url) {
-        throw new Error('URL do arquivo não recebida do servidor.');
+      let url = '';
+      try {
+        const blob = await upload(file.name, file, {
+          access: 'public',
+          handleUploadUrl: '/api/blob-upload',
+        });
+        if (!blob || !blob.url) {
+          throw new Error('URL do arquivo não recebida do servidor.');
+        }
+        url = blob.url;
+      } catch (uploadError) {
+        const fallbackUrl = await readFileAsDataUrl(file);
+        url = fallbackUrl;
       }
+
       const tipo = file.type.startsWith('video') ? 'video' : 'image';
       const fresh = await fetchList(CATALOGO_KEYS.midias);
       const updated = [...fresh, {
-        id: uid(), clienteId, categoria, url: blob.url, tipo,
+        id: uid(), clienteId, categoria, url, tipo,
         nomeArquivo: file.name, dataUpload: todayISO(),
       }];
       await storageSetWithRetry(CATALOGO_KEYS.midias, updated);
       setCatalogoMidias(updated);
-      setToast({ type: 'success', message: 'Arquivo enviado com sucesso.' });
+      setToast({ type: 'success', message: 'Arquivo salvo com sucesso.' });
     } catch (e) {
       const msg = e?.message || String(e);
       if (msg.includes('token') || msg.includes('401') || msg.includes('403')) {
