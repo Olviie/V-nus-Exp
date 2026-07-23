@@ -896,17 +896,24 @@ function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteC
         </label>
 
         {midias.length === 0 && (
-          <div className="text-center py-10 text-sm" style={{ color: theme.inkSoft }}>Nenhum arquivo nessa categoria ainda.</div>
+          <div className="rounded-[24px] border p-6 text-center" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+            <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>Categoria vazia</div>
+            <div className="text-sm leading-6" style={{ color: theme.inkSoft }}>
+              Ainda não há arquivos aqui. Envie o primeiro material para começar a montar essa coleção.
+            </div>
+          </div>
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {midias.map((m) => (
-            <div key={m.id} className="relative rounded-xl overflow-hidden border" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
-              {m.tipo === 'video' ? (
-                <video src={m.url} className="w-full h-32 object-cover" controls preload="metadata" />
-              ) : (
-                <img src={m.url} alt={m.nomeArquivo} className="w-full h-32 object-cover" />
-              )}
+            <div key={m.id} className="relative rounded-[20px] overflow-hidden border" style={{ borderColor: theme.border, backgroundColor: '#FFFDF9' }}>
+              <div className="aspect-[4/3] w-full overflow-hidden bg-[#F3ECE4]">
+                {m.tipo === 'video' ? (
+                  <video src={m.url} className="h-full w-full object-contain bg-black/90" controls preload="metadata" />
+                ) : (
+                  <img src={m.url} alt={m.nomeArquivo} className="h-full w-full object-contain" />
+                )}
+              </div>
               <div className="absolute top-1.5 right-1.5">
                 <ConfirmDeleteButton onConfirm={() => onDeleteMidia(m)} label="Excluir arquivo" />
               </div>
@@ -932,8 +939,8 @@ function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteC
               <button
                 key={cat}
                 onClick={() => setSelectedCategoria(cat)}
-                className="rounded-2xl border p-4 text-left transition-colors hover:opacity-90"
-                style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}
+                className="rounded-[24px] border p-4 text-left transition-all hover:opacity-90"
+                style={{ borderColor: theme.border, backgroundColor: '#FFFDF9', boxShadow: '0 8px 20px rgba(31, 26, 23, 0.04)' }}
               >
                 <div className="venusex-eyebrow mb-1.5" style={{ color: theme.accent }}>{cat}</div>
                 <div className="venusex-nums text-sm" style={{ color: theme.inkSoft }}>{count} arquivo{count === 1 ? '' : 's'}</div>
