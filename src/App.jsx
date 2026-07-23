@@ -994,6 +994,7 @@ function CatalogoTab({ catalogoClientes, catalogoMidias, onAddCliente, onDeleteC
 function InicioTab({ clientes, vendas }) {
   const agendamentos = useMemo(() => buildAgendamentos(vendas), [vendas]);
   const proximas = agendamentos.filter((item) => item.status === 'proxima' || item.status === 'vencida').length;
+  const valorTotal = vendas.reduce((sum, venda) => sum + Number(venda.valorVenda || 0), 0);
 
   const cards = [
     { label: 'Clientes', value: clientes.length, hint: 'cadastrados' },
@@ -1022,6 +1023,18 @@ function InicioTab({ clientes, vendas }) {
             <div className="text-sm" style={{ color: theme.inkSoft }}>{card.hint}</div>
           </div>
         ))}
+      </div>
+
+      <div className="rounded-[28px] border p-4" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="venusex-eyebrow mb-1" style={{ color: theme.accent }}>Valor total</div>
+            <div className="venusex-display text-xl" style={{ color: theme.ink }}>{formatBRL(valorTotal)}</div>
+          </div>
+          <div className="rounded-full px-3 py-1.5 text-xs font-medium" style={{ backgroundColor: theme.primarySoft, color: theme.ink }}>
+            visão prática
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1300,14 +1313,14 @@ export default function App() {
 
       {/* Top bar */}
       <header className="fixed top-0 left-0 right-0 z-40 px-4 py-4 flex items-center justify-between border-b" style={{ backgroundColor: theme.surface, borderColor: theme.border, boxShadow: '0 8px 24px rgba(31, 26, 23, 0.05)' }}>
-        <button onClick={() => setMenuOpen(true)} className="p-1 -ml-1">
+        <button onClick={() => setMenuOpen(true)} className="p-2 -ml-1 rounded-full" style={{ backgroundColor: theme.primarySoft }}>
           <Menu size={22} style={{ color: theme.ink }} />
         </button>
         <div className="flex items-center gap-2">
           <Store size={17} style={{ color: theme.accent }} />
           <span className="venusex-display text-base" style={{ color: theme.ink }}>Vênus Ex.</span>
         </div>
-        <button onClick={() => loadAll(true)} className="p-1 -mr-1">
+        <button onClick={() => loadAll(true)} className="p-2 -mr-1 rounded-full" style={{ backgroundColor: theme.primarySoft }}>
           <RefreshCw size={18} className={syncing ? 'animate-spin' : ''} style={{ color: theme.ink }} />
         </button>
       </header>
@@ -1322,7 +1335,7 @@ export default function App() {
                 <Store size={20} style={{ color: theme.accent }} />
                 <span className="venusex-display text-lg" style={{ color: theme.ink }}>Vênus Ex.</span>
               </div>
-              <button onClick={() => setMenuOpen(false)} className="p-1">
+              <button onClick={() => setMenuOpen(false)} className="p-2 rounded-full" style={{ backgroundColor: theme.primarySoft }}>
                 <X size={20} style={{ color: theme.ink }} />
               </button>
             </div>
