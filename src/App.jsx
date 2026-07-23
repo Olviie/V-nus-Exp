@@ -789,23 +789,23 @@ function ResumoTab({ vendas }) {
 
   return (
     <div className="pb-4">
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         <Field label="Data inicial"><TextInput type="date" value={dataInicial} onChange={(e) => setDataInicial(e.target.value)} /></Field>
         <Field label="Data final"><TextInput type="date" value={dataFinal} onChange={(e) => setDataFinal(e.target.value)} /></Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="rounded-2xl p-4" style={{ backgroundColor: theme.primary, color: theme.ink }}>
-          <div className="venusex-eyebrow opacity-70 mb-1">Valor arrecadado</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+        <div className="rounded-[24px] p-4" style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`, color: '#FFFFFF', boxShadow: '0 14px 30px rgba(111, 105, 95, 0.18)' }}>
+          <div className="venusex-eyebrow opacity-80 mb-1">Valor arrecadado</div>
           <div className="venusex-display venusex-nums text-2xl font-semibold">{formatBRL(total)}</div>
         </div>
-        <div className="rounded-2xl p-4 border" style={{ borderColor: theme.border, backgroundColor: '#FFFFFF' }}>
+        <div className="rounded-[24px] p-4 border" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
           <div className="venusex-eyebrow mb-1" style={{ color: theme.accent }}>Ticket médio</div>
           <div className="venusex-display venusex-nums text-2xl font-semibold" style={{ color: theme.ink }}>{formatBRL(ticketMedio)}</div>
         </div>
       </div>
 
-      <div className="rounded-3xl border p-4 mb-4" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
+      <div className="rounded-[28px] border p-4 mb-4" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
         <div className="venusex-eyebrow mb-3" style={{ color: theme.accent }}>Vendas por mês</div>
         {chartData.length === 0 ? (
           <div className="text-sm text-center py-8" style={{ color: theme.inkSoft }}>Sem dados no período selecionado.</div>
@@ -828,10 +828,11 @@ function ResumoTab({ vendas }) {
       <button
         onClick={() => exportarVendasExcel(filtered, dataInicial, dataFinal)}
         disabled={filtered.length === 0}
-        className="venusex-label w-full mb-4 py-3 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-opacity"
+        className="venusex-label w-full mb-4 py-3 rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-all"
         style={{
-          backgroundColor: filtered.length > 0 ? theme.primary : theme.border,
-          color: theme.ink,
+          backgroundColor: filtered.length > 0 ? theme.primarySoft : theme.border,
+          color: filtered.length > 0 ? theme.ink : theme.inkSoft,
+          boxShadow: filtered.length > 0 ? '0 10px 20px rgba(168, 137, 95, 0.16)' : 'none',
         }}
       >
         <Download size={18} />
@@ -1003,7 +1004,7 @@ function InicioTab({ clientes, vendas }) {
   return (
     <div className="pb-4 space-y-4">
       <div className="rounded-[28px] border p-5" style={{ ...cardStyle, background: `linear-gradient(135deg, ${theme.surface}, #FFFDF9)` }}>
-        <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>Visão geral</div>
+        <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>Resumo</div>
         <div className="venusex-display text-2xl mb-2" style={{ color: theme.ink }}>Seu fluxo de venda, em um só lugar.</div>
         <p className="text-sm leading-6" style={{ color: theme.inkSoft }}>
           Acompanhe clientes, vendas e cobranças com uma experiência mais clara, elegante e alinhada à sua marca.
@@ -1027,13 +1028,12 @@ function InicioTab({ clientes, vendas }) {
 /* App shell                                                            */
 /* ------------------------------------------------------------------ */
 const TABS = [
-  { key: 'inicio', label: 'Início', icon: Home },
+  { key: 'catalogo', label: 'Catálogo', icon: Image },
+  { key: 'resumo', label: 'Resumo', icon: BarChart3 },
   { key: 'venda', label: 'Nova venda', icon: PlusCircle },
   { key: 'clientes', label: 'Clientes', icon: Users },
   { key: 'vendas', label: 'Vendas', icon: ShoppingCart },
   { key: 'agendamentos', label: 'Agendamentos', icon: Calendar },
-  { key: 'resumo', label: 'Resumo', icon: BarChart3 },
-  { key: 'catalogo', label: 'Catálogo', icon: Image },
 ];
 
 function NavItems({ tab, onSelect }) {
@@ -1344,12 +1344,18 @@ export default function App() {
             </div>
           ) : (
             <>
-              {tab === 'inicio' && <InicioTab clientes={clientes} vendas={vendas} />}
+              {tab === 'resumo' && (
+                <>
+                  <div className="mb-4">
+                    <InicioTab clientes={clientes} vendas={vendas} />
+                  </div>
+                  <ResumoTab vendas={vendas} />
+                </>
+              )}
               {tab === 'venda' && <NovaVendaTab clientes={clientes} onSalvar={handleSalvar} saving={saving} />}
               {tab === 'clientes' && <ClientesTab clientes={clientes} onDelete={handleDeleteCliente} />}
               {tab === 'vendas' && <VendasTab vendas={vendas} onDelete={handleDeleteVenda} />}
               {tab === 'agendamentos' && <AgendamentosTab vendas={vendas} onTogglePagamento={handleTogglePagamento} />}
-              {tab === 'resumo' && <ResumoTab vendas={vendas} />}
               {tab === 'catalogo' && (
                 <CatalogoTab
                   catalogoClientes={catalogoClientes}
