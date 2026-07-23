@@ -1053,10 +1053,11 @@ function InicioTab({ clientes, vendas }) {
 const TABS = [
   { key: 'catalogo', label: 'Catálogo', icon: Image },
   { key: 'resumo', label: 'Resumo', icon: BarChart3 },
-  { key: 'venda', label: 'Nova venda', icon: PlusCircle },
-  { key: 'clientes', label: 'Clientes', icon: Users },
-  { key: 'vendas', label: 'Vendas', icon: ShoppingCart },
   { key: 'agendamentos', label: 'Agendamentos', icon: Calendar },
+  { key: 'venda', label: 'Nova Venda', icon: PlusCircle },
+  { key: 'clientes', label: 'Cliente', icon: Users },
+  { key: 'vendas', label: 'Vendas', icon: ShoppingCart },
+  { key: 'sobre', label: 'Sobre', icon: Home },
 ];
 
 function NavItems({ tab, onSelect }) {
@@ -1389,6 +1390,14 @@ export default function App() {
                   onDeleteMidia={handleDeleteMidia}
                   uploading={uploadingMidia}
                 />
+              )}
+              {tab === 'sobre' && (
+                <div className="rounded-[28px] border p-6 text-center" style={{ ...cardStyle, backgroundColor: '#FFFDF9' }}>
+                  <div className="venusex-eyebrow mb-2" style={{ color: theme.accent }}>Sobre</div>
+                  <div className="text-sm leading-6" style={{ color: theme.inkSoft }}>
+                    Em breve, esta área receberá mais informações sobre a marca e o projeto.
+                  </div>
+                </div>
               )}
             </>
           )}
