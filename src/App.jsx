@@ -959,24 +959,14 @@ function NavItems({ tab, onSelect }) {
       {TABS.map((t) => {
         const Icon = t.icon;
         const active = tab === t.key;
-        return (
+return (
           <button
             key={t.key}
             onClick={() => onSelect(t.key)}
+            className="venusex-label flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors text-left"
             style={active
               ? { backgroundColor: 'rgba(26,26,26,0.1)', color: theme.ink }
-              : { backgroundColor: 'transparent', color: theme.inkSoft }}
-          >
-            <Icon size={19} />
-            {t.label}
-          </button>
-        );
-      })}
-    </nav>
-  );
-}
-
-const TABS = [
+              : { backgroundColor: 'trans
   { key: 'inicio', label: 'Início', icon: Home },
   { key: 'venda', label: 'Nova venda', icon: PlusCircle },
   { key: 'clientes', label: 'Clientes', icon: Users },
